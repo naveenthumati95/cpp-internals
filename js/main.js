@@ -795,16 +795,22 @@ function initBackToTop() {
   });
 }
 
-// Mobile menu
-function initMobileMenu() {
+// Menu toggle (Mobile & Desktop)
+function initMenuToggle() {
   const menuToggle = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
 
   if (menuToggle && sidebar) {
     menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('active');
+      if (window.innerWidth <= 768) {
+        // Mobile behavior
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active');
+      } else {
+        // Desktop behavior
+        document.body.classList.toggle('sidebar-collapsed');
+      }
     });
   }
 
@@ -842,6 +848,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initProgressBar();
   initBackToTop();
-  initMobileMenu();
+  initMenuToggle();
   initRouter();
 });
