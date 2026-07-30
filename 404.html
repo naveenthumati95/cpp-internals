@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — C++ Internals</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container { max-width: 500px; padding: 2rem; }
+        h1 { font-size: 6rem; background: linear-gradient(135deg, #58a6ff, #bc8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+        p { font-size: 1.2rem; margin: 1rem 0; color: #8b949e; }
+        a { color: #58a6ff; text-decoration: none; font-weight: 500; padding: 0.75rem 2rem; border: 1px solid #58a6ff; border-radius: 8px; display: inline-block; margin-top: 1rem; transition: all 0.3s; }
+        a:hover { background: #58a6ff; color: #0d1117; }
+        .code { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #8b949e; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Segmentation fault (core dumped)</p>
+        <p>The page you're looking for doesn't exist.</p>
+        <a href="./">← Return to Home</a>
+        <div class="code">std::runtime_error("page_not_found")</div>
+    </div>
+</body>
+</html>
