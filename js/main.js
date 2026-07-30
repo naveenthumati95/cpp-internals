@@ -143,7 +143,7 @@ function renderHomePage(container) {
 
     <div class="category-filters fade-in">
       <button class="filter-btn active" data-filter="all">All Topics</button>
-      ${CATEGORIES.map(c => `<button class="filter-btn" data-filter="${c}">${CATEGORY_ICONS[c] || ''} ${c}</button>`).join('')}
+      ${CATEGORIES.map(c => `<button class="filter-btn" data-filter="${c}">${c}</button>`).join('')}
     </div>
 
     <div class="topic-grid fade-in" id="topicGrid">
@@ -484,12 +484,10 @@ function renderSidebar() {
 
   CATEGORIES.forEach(category => {
     const topics = TOPICS.filter(t => t.category === category);
-    const icon = CATEGORY_ICONS[category] || '📁';
-
     html += `
       <div class="sidebar-category" data-category="${category}">
         <div class="sidebar-category-header" onclick="toggleCategory(this)">
-          <span>${icon} ${category}</span>
+          <span>${category}</span>
           <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="sidebar-category-topics">
