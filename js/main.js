@@ -49,7 +49,18 @@ let currentSearchResults = [];
 // =============================================
 function configureMarkdown() {
   if (typeof marked !== 'undefined') {
+    const renderer = new marked.Renderer();
+    
+    // Custom link renderer to support Godbolt iframes
+    renderer.link = function(href, title, text) {
+      if (text && text.toLowerCase() === 'godbolt' && href && href.includes('godbolt.org')) {
+        return `<div class="godbolt-wrapper"><iframe src="${href}" allowfullscreen></iframe></div>`;
+      }
+      return `<a href="${href}" ${title ? `title="${title}"` : ''} target="_blank" rel="noopener noreferrer">${text}</a>`;
+    };
+
     marked.setOptions({
+      renderer: renderer,
       gfm: true,
       breaks: true,
       highlight: function(code, lang) {
@@ -539,12 +550,16 @@ function renderSidebar() {
           <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="sidebar-category-topics">
-          ${topics.map(t => `
+          ${topics.map(t => {
+            const isRead = localStorage.getItem('read_' + t.id) === 'true';
+            return `
             <a href="#/topic/${t.id}" class="sidebar-link" data-topic-id="${t.id}">
               <span class="sidebar-link-dot"></span>
               ${t.title}
+              ${isRead ? '<svg class="read-checkmark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#27c93f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
             </a>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -578,9 +593,21 @@ function updateSidebarActiveItem() {
 
   if (hash.startsWith('#/topic/')) {
     const topicId = hash.replace('#/topic/', '');
+    
+    // PROGRESS TRACKER: Mark as read
+    if (localStorage.getItem('read_' + topicId) !== 'true') {
+      localStorage.setItem('read_' + topicId, 'true');
+    }
+
     const activeLink = document.querySelector(`.sidebar-link[data-topic-id="${topicId}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
+      
+      // If checkmark doesn't exist yet, add it
+      if (!activeLink.querySelector('.read-checkmark')) {
+        activeLink.insertAdjacentHTML('beforeend', '<svg class="read-checkmark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#27c93f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+      }
+
       // Ensure parent category is expanded
       const categoryDiv = activeLink.closest('.sidebar-category');
       if (categoryDiv) categoryDiv.classList.remove('collapsed');
