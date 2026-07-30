@@ -1610,15 +1610,3 @@ a:hover {
   height: 100%;
   border: none;
 }
-
-/* =============================================
-   Feature: Reading Progress Tracker
-   ============================================= */
-.read-checkmark {
-  margin-left: auto;
-  opacity: 0;
-  animation: fadeIn 0.3s forwards;
-}
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
