@@ -1530,3 +1530,57 @@ a:hover {
     page-break-inside: avoid;
   }
 }
+
+/* =============================================
+   Crazy About Page IDE Styles
+   ============================================= */
+.about-ide-window {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+  margin-top: 2rem;
+  font-family: var(--font-code);
+}
+.ide-header {
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.ide-dots {
+  display: flex;
+  gap: 6px;
+}
+.ide-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.dot.red { background-color: #ff5f56; }
+.dot.yellow { background-color: #ffbd2e; }
+.dot.green { background-color: #27c93f; }
+
+.ide-filename {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #8b949e;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+}
+.ide-content {
+  padding: 0;
+}
+.ide-content pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent !important;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}

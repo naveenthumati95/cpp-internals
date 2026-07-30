@@ -451,14 +451,66 @@ function renderAboutPage(container) {
   if (toc) toc.style.display = 'none';
 
   container.innerHTML = `
-    <div class="fade-in article-content">
-      <h1>#include &lt;about&gt;</h1>
-      <p><code>std::cout &lt;&lt; "Welcome to C++ Internals!" &lt;&lt; std::endl;</code></p>
-      <p>This course is designed exclusively for our college by the <strong>Coding Club, IIT Guwahati</strong>. It explores what happens beneath the surface of modern C++ programs, from compilation down to runtime execution.</p>
-      <h2>int main() { return mission; }</h2>
-      <p>We believe that truly understanding a programming language means understanding its internals — how the compiler transforms your code, how objects live and die in memory, how templates expand at compile time, and how the runtime manages exceptions and concurrency.</p>
-      <h2>class Architecture</h2>
-      <p>The course covers ${TOPICS.length} topics across ${CATEGORIES.length} carefully structured categories, diving deep into the core mechanics, modern C++ paradigms, and low-level performance tuning.</p>
+    <div class="fade-in article-content about-ide-window">
+      <div class="ide-header">
+        <div class="ide-dots">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        </div>
+        <div class="ide-filename">src/about.cpp</div>
+      </div>
+      <div class="ide-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;stdexcept&gt;
+#include "IITG_CodingClub.h"
+
+<span class="hljs-comment">/* ========================================================================
+ * WARNING: You are leaving the safe zone of Python and JS.
+ * This course is designed exclusively for our college by the 
+ * Coding Club, IIT Guwahati. Get ready to manage your own memory.
+ * ======================================================================== */</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">CppInternals</span> {
+<span class="hljs-keyword">private</span>:
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* mission = 
+        <span class="hljs-string">"To peel back the abstractions. "</span>
+        <span class="hljs-string">"We don't just want you to write C++. "</span>
+        <span class="hljs-string">"We want you to see the assembly, feel the cache lines, and hear the CPU weeping."</span>;
+
+    <span class="hljs-type">int</span> difficulty_level = <span class="hljs-number">0xDEADBEEF</span>; <span class="hljs-comment">// Unforgiving.</span>
+
+<span class="hljs-keyword">public</span>:
+    <span class="hljs-built_in">CppInternals</span>() {
+        std::cout &lt;&lt; <span class="hljs-string">"Initializing ${TOPICS.length} topics across ${CATEGORIES.length} categories..."</span> &lt;&lt; std::endl;
+        
+        <span class="hljs-comment">/* 
+         * WHAT TO EXPECT:
+         * -&gt; Template Metaprogramming (Turing-complete black magic)
+         * -&gt; STL Internals (How std::vector really allocates)
+         * -&gt; Lock-Free Concurrency (Because mutexes are for the weak)
+         * -&gt; Rvalues & Perfect Forwarding (Stop copying things unnecessarily!)
+         */</span>
+    }
+
+    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">execute</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-built_in">learn_architecture</span>();
+                <span class="hljs-built_in">master_memory_model</span>();
+                <span class="hljs-built_in">optimize_performance</span>();
+            } <span class="hljs-keyword">catch</span> (<span class="hljs-type">const</span> std::bad_alloc&amp; e) {
+                std::cerr &lt;&lt; <span class="hljs-string">"You forgot to check your heap space. Try again."</span> &lt;&lt; std::endl;
+            }
+        }
+    }
+};
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    std::unique_ptr&lt;CppInternals&gt; course = std::make_unique&lt;CppInternals&gt;();
+    course-&gt;<span class="hljs-built_in">execute</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>; <span class="hljs-comment">// We never actually reach here.</span>
+}</code></pre>
+      </div>
     </div>
   `;
 }
