@@ -9,9 +9,9 @@
 // =============================================
 
 const CONTRIBUTORS = [
-  { name: 'Naveen Thumati', role: 'Core Contributor', github: 'naveenthumati95', linkedin: 'https://www.linkedin.com/in/naveenthumati95/', avatar: null, bio: 'Passionate about understanding C++ from the ground up.' },
+  { name: 'Naveen Thumati', role: 'Core Contributor', github: 'naveenthumati95', linkedin: 'https://www.linkedin.com/in/naveenthumati95/', avatar: null, bio: 'Diving deep into systems programming and C++ architecture.' },
   { name: 'Aryan Chakravorty', role: 'Core Contributor', github: 'aryanchakravorty', linkedin: 'https://www.linkedin.com/in/aryan-chakravorty-414118357/', avatar: null, bio: 'Exploring the depths of modern C++ internals.' },
-  { name: 'Abhiraj Singh', role: 'Core Contributor', github: 'abhirajsingh', linkedin: 'https://www.linkedin.com/in/abhirajsingh154/', avatar: null, bio: 'Diving deep into systems programming and C++ architecture.' }
+  { name: 'Abhiraj Singh', role: 'Core Contributor', github: 'abhirajsingh', linkedin: 'https://www.linkedin.com/in/abhirajsingh154/', avatar: null, bio: 'Passionate about understanding C++ from the ground up.' }
 ];
 
 const TOPICS = [
@@ -124,7 +124,7 @@ function renderHomePage(container) {
   let html = `
     <div class="hero-section fade-in">
       <h1 class="hero-title">C++ Internals</h1>
-      <p class="hero-subtitle">Deep dive into the architecture, memory model, and runtime of modern C++. An open-source collaborative course.</p>
+      <p class="hero-subtitle">Deep dive into the architecture, memory model, and runtime of modern C++. A course by the Coding Club, IIT Guwahati.</p>
       <div class="stats-section">
         <div class="stat-item">
           <div class="stat-number">${TOPICS.length}</div>
@@ -202,7 +202,6 @@ function renderTopicCards(topics) {
     <a href="#/topic/${t.id}" class="topic-card">
       <div class="topic-card-header">
         <span class="topic-author">By ${t.author}</span>
-        <span class="badge ${t.difficulty}">${t.difficulty}</span>
       </div>
       <h3>${t.title}</h3>
       <p>${t.description}</p>
@@ -233,7 +232,6 @@ async function renderTopicPage(topicId, container) {
       <div class="topic-meta">
         <span class="tag">${topic.category}</span>
         <span class="topic-author">By ${topic.author}</span>
-        <span class="badge ${topic.difficulty}">${topic.difficulty}</span>
         <span class="read-time" id="readTime">⏱ Calculating...</span>
       </div>
     </div>
@@ -431,10 +429,16 @@ function renderContributorsPage(container) {
             <div class="contributor-name">${c.name}</div>
             <div class="contributor-role">${c.role}</div>
             <p class="contributor-bio">${c.bio}</p>
-            <a href="https://github.com/${c.github}" target="_blank" rel="noopener noreferrer" class="contributor-github">
+            <a href="https://github.com/${c.github}" target="_blank" rel="noopener noreferrer" class="contributor-link">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              @${c.github}
+              GitHub
             </a>
+            ${c.linkedin ? `
+            <a href="${c.linkedin}" target="_blank" rel="noopener noreferrer" class="contributor-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+              LinkedIn
+            </a>
+            ` : ''}
           </div>
         `).join('')}
       </div>
@@ -448,21 +452,13 @@ function renderAboutPage(container) {
 
   container.innerHTML = `
     <div class="fade-in article-content">
-      <h1>About C++ Internals</h1>
-      <p>C++ Internals is an open-source, collaborative course that explores what happens beneath the surface of modern C++ programs.</p>
-      <h2>Our Mission</h2>
+      <h1>#include &lt;about&gt;</h1>
+      <p><code>std::cout &lt;&lt; "Welcome to C++ Internals!" &lt;&lt; std::endl;</code></p>
+      <p>This course is designed exclusively for our college by the <strong>Coding Club, IIT Guwahati</strong>. It explores what happens beneath the surface of modern C++ programs, from compilation down to runtime execution.</p>
+      <h2>int main() { return mission; }</h2>
       <p>We believe that truly understanding a programming language means understanding its internals — how the compiler transforms your code, how objects live and die in memory, how templates expand at compile time, and how the runtime manages exceptions and concurrency.</p>
-      <h2>How It Works</h2>
-      <p>Each topic is written as a Markdown file and automatically rendered on this website. The course covers 18 topics across 6 categories, ranging from beginner-friendly introductions to advanced deep dives.</p>
-      <h2>Contributing</h2>
-      <p>Want to contribute? Fork the repository, write or improve a topic in the <code>topics/</code> directory, and submit a pull request. All content is written in GitHub Flavored Markdown.</p>
-      <h2>Tech Stack</h2>
-      <ul>
-        <li>Pure HTML5, CSS3, and Vanilla JavaScript</li>
-        <li><strong>marked.js</strong> for Markdown rendering</li>
-        <li><strong>highlight.js</strong> for code syntax highlighting</li>
-        <li>Hosted on <strong>GitHub Pages</strong></li>
-      </ul>
+      <h2>class Architecture</h2>
+      <p>The course covers ${TOPICS.length} topics across ${CATEGORIES.length} carefully structured categories, diving deep into the core mechanics, modern C++ paradigms, and low-level performance tuning.</p>
     </div>
   `;
 }
@@ -674,7 +670,7 @@ function renderSearchResults(container) {
     <a href="#/topic/${t.id}" class="search-result-item ${i === currentSearchIndex ? 'selected' : ''}" data-index="${i}">
       <div class="search-result-info">
         <div class="search-result-title">${t.title}</div>
-        <div class="search-result-meta">${t.category} · ${t.difficulty}</div>
+        <div class="search-result-meta">${t.category}</div>
       </div>
     </a>
   `).join('');
