@@ -672,7 +672,6 @@ function renderSearchResults(container) {
 
   container.innerHTML = currentSearchResults.map((t, i) => `
     <a href="#/topic/${t.id}" class="search-result-item ${i === currentSearchIndex ? 'selected' : ''}" data-index="${i}">
-      <div class="search-result-icon">${t.icon}</div>
       <div class="search-result-info">
         <div class="search-result-title">${t.title}</div>
         <div class="search-result-meta">${t.category} · ${t.difficulty}</div>
