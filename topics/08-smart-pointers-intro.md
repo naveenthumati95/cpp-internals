@@ -1,4 +1,4 @@
-# Smart Pointers, RAII & Exception Handling Intro
+# Introduction
 
 > 🚧 **Note:** This topic is currently being written by Naveen Thumati.
 

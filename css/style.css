@@ -1259,12 +1259,12 @@ a:hover {
   font-size: 0.78rem;
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1500px) {
   .toc {
     display: block;
   }
   .main-wrapper {
-    margin-right: calc(var(--toc-width) + var(--space-xl) + var(--space-xl));
+    padding-right: calc(var(--toc-width) + var(--space-xl));
   }
 }
 
