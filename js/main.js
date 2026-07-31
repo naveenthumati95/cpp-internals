@@ -609,11 +609,11 @@ function renderSidebar() {
             <a href="#/topic/${t.id}" class="sidebar-link" data-topic-id="${t.id}">
               <span class="sidebar-link-dot"></span>
               ${t.title}
-              ${t.subtopics ? '<svg class="subtopics-chevron rotated" onclick="toggleSubtopics(event, this)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' : ''}
+              ${t.subtopics ? '<svg class="subtopics-chevron" onclick="toggleSubtopics(event, this)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' : ''}
             </a>
             `;
             if (t.subtopics) {
-              htmlChunk += `<div class="sidebar-subtopics-container collapsed">
+              htmlChunk += `<div class="sidebar-subtopics-container">
                 ${t.subtopics.map(sub => `
                   <a href="#/topic/${sub.id}" class="sidebar-sublink" data-topic-id="${sub.id}">
                     ${sub.title}
