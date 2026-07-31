@@ -46,19 +46,16 @@ First let's understand why memory leaks are **dangerous**:
 
 However, memory leaks are only one consequence of manual resource management. Incorrect use of raw pointers can also result in:
 
-- Dangling pointers
-
-- Double deletion
-
-- Use-after-free bugs
-
-- Exception-unsafe code
+- **Dangling pointers:** Pointers that still hold a memory address after the memory has been freed.
+- **Double deletion:** Attempting to `delete` the same memory address twice, which corrupts the heap and crashes the program.
+- **Use-after-free bugs:** Accessing memory after it has been deleted, leading to unpredictable undefined behavior.
+- **Exception-unsafe code:** Failing to release resources when an exception disrupts the normal control flow.
 
 These bugs are often subtle, difficult to reproduce, and can lead to undefined behavior.
 
 ### The Modern C++ Solution
 
-Modern C++ addresses these problems through **RAII (Resource Acquisition Is Initialization)**.
+Modern C++ addresses these problems through **RAII (Resource Acquisition Is Initialization)** and the concept of **Ownership**.
 
 The core idea of RAII is simple:
 
@@ -68,7 +65,17 @@ Because destructors are invoked automatically whenever an object leaves scope—
 
 Although this chapter focuses primarily on dynamically allocated memory, RAII is a general resource management technique and is equally applicable to files, mutexes, sockets, database connections, threads, and many other resources.
 
-Building upon RAII, the C++ Standard Library provides **smart pointers**, which automatically manage the lifetime of dynamically allocated objects while eliminating the need for explicit memory management in most programs.
+Building upon RAII, the C++ Standard Library provides **smart pointers**. These don't just clean up memory; they strictly enforce *who owns the memory* (exclusive ownership vs. shared ownership) directly in the type system.
+
+**The Modern Way:**
+```cpp
+#include <memory>
+
+// No 'new', no 'delete', 100% safe
+auto ptr = std::make_unique<Obj>(); 
+
+foo(); // If foo() throws an exception, ptr is automatically cleaned up!
+```
 
 In this section, we will dive deep into the internals of resource management. Use the sidebar to navigate through the subtopics:
 
