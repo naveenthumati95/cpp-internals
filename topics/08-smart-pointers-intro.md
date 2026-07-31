@@ -37,13 +37,12 @@ As programs grow larger, manually ensuring that every resource is released along
 
 First let's understand why memory leaks are **dangerous**:
 
-* **Increased Memory Usage**
-  
-  * Memory that is no longer needed remains allocated, causing the memory consumption to grow continuosly.
+- **Increased Memory Usage**
+  - Memory that is no longer needed remains allocated, causing the memory consumption to grow continuously.
 - **Memory Exhaustion**
-  - Eventually, we may run out of available memory, causing `new` to fail (`std::bad_alloc`) or return nullptr with (`std::no_throw`).
+  - Eventually, we may run out of available memory, causing `new` to fail (`std::bad_alloc`) or return a null pointer with `std::nothrow`.
 - **Performance Degradation**
-  - As memory usage increases, the program may experience slower allocations, poorer cache performance etc.
+  - As memory usage increases, the program may experience slower allocations, poorer cache performance, etc.
 
 However, memory leaks are only one consequence of manual resource management. Incorrect use of raw pointers can also result in:
 
