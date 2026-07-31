@@ -27,7 +27,23 @@ const TOPICS = [
   { id: 'stl-containers-internals', title: 'STL Containers & Internal Complexities', file: 'topics/07-stl-containers-internals.md', category: 'Templates & STL', author: 'Aryan Chakravorty', difficulty: 'advanced', description: 'How vector, map, unordered_map, deque work internally. Custom implementations of vector and map with time complexity analysis.' },
   
   // Modern C++ & Performance (Naveen)
-  { id: 'smart-pointers-raii', title: 'Smart Pointers, RAII & Exception Safety', file: 'topics/08-smart-pointers-raii-exception-safety.md', category: 'Modern C++ & Performance', author: 'Naveen Thumati', difficulty: 'advanced', description: 'unique_ptr, shared_ptr, weak_ptr internals, RAII pattern, exception safety guarantees (basic, strong, nothrow).' },
+  { 
+    id: 'smart-pointers-raii', 
+    title: 'Smart Pointers, RAII & Exception handling', 
+    file: 'topics/08-smart-pointers-intro.md', 
+    category: 'Modern C++ & Performance', 
+    author: 'Naveen Thumati', 
+    difficulty: 'advanced', 
+    description: 'unique_ptr, shared_ptr, weak_ptr internals, RAII pattern, exceptions.',
+    subtopics: [
+      { id: 'raii', title: '1. RAII', file: 'topics/08a-raii.md' },
+      { id: 'unique-ptr', title: '2. std::unique_ptr', file: 'topics/08b-unique-ptr.md' },
+      { id: 'shared-ptr', title: '3. std::shared_ptr', file: 'topics/08c-shared-ptr.md' },
+      { id: 'weak-ptr', title: '4. std::weak_ptr', file: 'topics/08d-weak-ptr.md' },
+      { id: 'make-unique-shared', title: '5. std::make_unique & std::make_shared', file: 'topics/08e-make-unique-shared.md' },
+      { id: 'exceptions-handling', title: '6. Exceptions and handling', file: 'topics/08f-exceptions-handling.md' }
+    ]
+  },
   { id: 'performance-low-latency', title: 'Performance & Low-Latency Patterns', file: 'topics/09-performance-low-latency.md', category: 'Modern C++ & Performance', author: 'Naveen Thumati', difficulty: 'advanced', description: 'Cache lines, false sharing, alignment, branch prediction, SIMD hints, and understanding how C++ maps to assembly.' },
   { id: 'modern-cpp-best-practices', title: 'Best Modern C++ Practices', file: 'topics/10-modern-cpp-best-practices.md', category: 'Modern C++ & Performance', author: 'Naveen Thumati', difficulty: 'intermediate', description: 'Why constexpr over macros, nullptr vs NULL/0, noexcept, structured bindings, std::optional, and other modern idioms.' },
   
@@ -122,6 +138,28 @@ async function handleRoute() {
     article.innerHTML = '<div class="coming-soon"><h2>Error</h2><p>Failed to load the page. Please try again.</p></div>';
     if (loadingSpinner) loadingSpinner.style.display = 'none';
   }
+}
+
+// =============================================
+// HELPER: FIND TOPIC OR SUBTOPIC
+// =============================================
+function findTopicById(id) {
+  for (const t of TOPICS) {
+    if (t.id === id) return t;
+    if (t.subtopics) {
+      const sub = t.subtopics.find(s => s.id === id);
+      if (sub) {
+        // Return a proxy object so we can read author and category from parent
+        return {
+          ...sub,
+          author: t.author,
+          category: t.category,
+          difficulty: t.difficulty
+        };
+      }
+    }
+  }
+  return null;
 }
 
 // =============================================
@@ -222,7 +260,7 @@ function renderTopicCards(topics) {
 }
 
 async function renderTopicPage(topicId, container) {
-  const topic = TOPICS.find(t => t.id === topicId);
+  const topic = findTopicById(topicId);
 
   if (!topic) {
     container.innerHTML = '<div class="coming-soon"><h2>404 — Topic Not Found</h2><p>This topic does not exist.</p><a href="#/">← Back to Home</a></div>';
@@ -252,9 +290,14 @@ async function renderTopicPage(topicId, container) {
   `;
 
   // Prev / Next navigation
-  const currentIndex = TOPICS.findIndex(t => t.id === topicId);
-  const prevTopic = currentIndex > 0 ? TOPICS[currentIndex - 1] : null;
-  const nextTopic = currentIndex < TOPICS.length - 1 ? TOPICS[currentIndex + 1] : null;
+  const flatTopics = [];
+  TOPICS.forEach(t => {
+    flatTopics.push(t);
+    if (t.subtopics) flatTopics.push(...t.subtopics);
+  });
+  const currentIndex = flatTopics.findIndex(t => t.id === topicId);
+  const prevTopic = currentIndex > 0 ? flatTopics[currentIndex - 1] : null;
+  const nextTopic = currentIndex < flatTopics.length - 1 ? flatTopics[currentIndex + 1] : null;
 
   html += `<div class="topic-navigation fade-in">`;
   if (prevTopic) {
@@ -550,12 +593,24 @@ function renderSidebar() {
           <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="sidebar-category-topics">
-          ${topics.map(t => `
+          ${topics.map(t => {
+            let htmlChunk = `
             <a href="#/topic/${t.id}" class="sidebar-link" data-topic-id="${t.id}">
               <span class="sidebar-link-dot"></span>
               ${t.title}
             </a>
-          `).join('')}
+            `;
+            if (t.subtopics) {
+              htmlChunk += `<div class="sidebar-subtopics-container">
+                ${t.subtopics.map(sub => `
+                  <a href="#/topic/${sub.id}" class="sidebar-sublink" data-topic-id="${sub.id}">
+                    ${sub.title}
+                  </a>
+                `).join('')}
+              </div>`;
+            }
+            return htmlChunk;
+          }).join('')}
         </div>
       </div>
     `;
@@ -589,8 +644,7 @@ function updateSidebarActiveItem() {
 
   if (hash.startsWith('#/topic/')) {
     const topicId = hash.replace('#/topic/', '');
-    
-    const activeLink = document.querySelector(`.sidebar-link[data-topic-id="${topicId}"]`);
+    const activeLink = document.querySelector(`a[data-topic-id="${topicId}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
       
