@@ -1264,7 +1264,7 @@ a:hover {
     display: block;
   }
   .main-wrapper {
-    margin-right: calc(var(--toc-width) + var(--space-xl));
+    margin-right: calc(var(--toc-width) + var(--space-xl) + var(--space-xl));
   }
 }
 
