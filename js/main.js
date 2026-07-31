@@ -67,12 +67,25 @@ function configureMarkdown() {
   if (typeof marked !== 'undefined') {
     const renderer = new marked.Renderer();
     
-    // Custom link renderer to support Godbolt iframes
-    renderer.link = function(href, title, text) {
+    // Custom link renderer to support Godbolt iframes and new Marked API
+    renderer.link = function(tokenOrHref, possibleTitle, possibleText) {
+      let href, title, text;
+      if (typeof tokenOrHref === 'object' && tokenOrHref !== null) {
+        href = tokenOrHref.href;
+        title = tokenOrHref.title;
+        text = tokenOrHref.text;
+      } else {
+        href = tokenOrHref;
+        title = possibleTitle;
+        text = possibleText;
+      }
+
       if (text && text.toLowerCase() === 'godbolt' && href && href.includes('godbolt.org')) {
         return `<div class="godbolt-wrapper"><iframe src="${href}" allowfullscreen></iframe></div>`;
       }
-      return `<a href="${href}" ${title ? `title="${title}"` : ''} target="_blank" rel="noopener noreferrer">${text}</a>`;
+      
+      const targetAttr = (href && href.startsWith('#')) ? '' : ' target="_blank" rel="noopener noreferrer"';
+      return `<a href="${href}" ${title ? `title="${title}"` : ''}${targetAttr}>${text}</a>`;
     };
 
     marked.setOptions({

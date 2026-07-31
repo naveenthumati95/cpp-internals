@@ -21,8 +21,6 @@ The above program finishes successfully, but the memory allocated for Obj is nev
 > 
 > A **memory leak** occurs when memory is allocated on the heap but is **never freed**, even though the program no longer needs it.
 
-
-
 Unfortunately, forgetting to call `delete` is not the only way memory leaks occur. Even if you remember to write `delete`, an exception or an early return can bypass the cleanup code entirely:
 
 ```cpp
@@ -68,6 +66,7 @@ Although this chapter focuses primarily on dynamically allocated memory, RAII is
 Building upon RAII, the C++ Standard Library provides **smart pointers**. These don't just clean up memory; they strictly enforce *who owns the memory* (exclusive ownership vs. shared ownership) directly in the type system.
 
 **The Modern Way:**
+
 ```cpp
 #include <memory>
 
