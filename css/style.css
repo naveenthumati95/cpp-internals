@@ -334,6 +334,23 @@ a:hover {
   gap: 4px;
   border-left: 1px solid var(--border-color);
   margin-left: 14px;
+  overflow: hidden;
+}
+
+.sidebar-subtopics-container.collapsed {
+  display: none;
+}
+
+.subtopics-chevron {
+  margin-left: auto;
+  transition: transform var(--transition-fast);
+  color: var(--text-muted);
+}
+.subtopics-chevron:hover {
+  color: var(--text-primary);
+}
+.subtopics-chevron.rotated {
+  transform: rotate(-90deg);
 }
 
 .sidebar-sublink {

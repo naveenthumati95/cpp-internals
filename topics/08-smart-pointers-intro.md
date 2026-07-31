@@ -6,12 +6,12 @@ Memory leaks, dangling pointers, and double-free errors have haunted C++ develop
 
 In this section, we will dive deep into the internals of resource management. Use the sidebar to navigate through the subtopics:
 
-1. **RAII**
-2. **std::unique_ptr**
-3. **std::shared_ptr**
-4. **std::weak_ptr**
-5. **std::make_unique & std::make_shared**
-6. **Exceptions and handling**
+1. [**RAII**](#/topic/raii)
+2. [**std::unique_ptr**](#/topic/unique-ptr)
+3. [**std::shared_ptr**](#/topic/shared-ptr)
+4. [**std::weak_ptr**](#/topic/weak-ptr)
+5. [**std::make_unique & std::make_shared**](#/topic/make-unique-shared)
+6. [**Exceptions and handling**](#/topic/exceptions-handling)
 
 ---
 *Last updated: July 2026*

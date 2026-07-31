@@ -162,6 +162,17 @@ function findTopicById(id) {
   return null;
 }
 
+window.toggleSubtopics = function(event, element) {
+  event.preventDefault();
+  event.stopPropagation();
+  const link = element.closest('.sidebar-link');
+  const container = link.nextElementSibling;
+  if (container && container.classList.contains('sidebar-subtopics-container')) {
+    container.classList.toggle('collapsed');
+    element.classList.toggle('rotated');
+  }
+};
+
 // =============================================
 // PAGE RENDERERS
 // =============================================
@@ -598,6 +609,7 @@ function renderSidebar() {
             <a href="#/topic/${t.id}" class="sidebar-link" data-topic-id="${t.id}">
               <span class="sidebar-link-dot"></span>
               ${t.title}
+              ${t.subtopics ? '<svg class="subtopics-chevron" onclick="toggleSubtopics(event, this)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' : ''}
             </a>
             `;
             if (t.subtopics) {
@@ -651,6 +663,17 @@ function updateSidebarActiveItem() {
       // Ensure parent category is expanded
       const categoryDiv = activeLink.closest('.sidebar-category');
       if (categoryDiv) categoryDiv.classList.remove('collapsed');
+
+      // If it's a subtopic, make sure its parent container is expanded
+      const subtopicContainer = activeLink.closest('.sidebar-subtopics-container');
+      if (subtopicContainer) {
+        subtopicContainer.classList.remove('collapsed');
+        const parentLink = subtopicContainer.previousElementSibling;
+        if (parentLink) {
+          const chevron = parentLink.querySelector('.subtopics-chevron');
+          if (chevron) chevron.classList.remove('rotated');
+        }
+      }
     }
   } else {
     const activeLink = document.querySelector(`.sidebar-link[data-route="${hash}"]`);
