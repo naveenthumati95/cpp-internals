@@ -1263,6 +1263,9 @@ a:hover {
   .toc {
     display: block;
   }
+  .main-wrapper {
+    margin-right: calc(var(--toc-width) + var(--space-xl));
+  }
 }
 
 /* =============================================
