@@ -16,8 +16,24 @@ const CONTRIBUTORS = [
 
 const TOPICS = [
   // Core Mechanics & OOP (Abhiraj)
-  { id: 'oops', title: 'Object-Oriented Programming in C++', file: 'topics/01-oops.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'beginner', description: 'Classes, inheritance, polymorphism, encapsulation, abstraction — the OOP pillars in C++ and how they work under the hood.' },
-  { id: 'pointers-functors-lambdas', title: 'Pointers, Functors & Lambdas', file: 'topics/02-pointers-functors-lambdas.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'intermediate', description: 'Function pointers, callable objects, functor classes, and lambda expressions — how they relate and when to use each.' },
+  { 
+    id: '01-memory-layout-and-pointers', 
+    title: 'Memory Layout and Pointers', 
+    file: 'topics/01-memory-pointers-intro.md', 
+    category: 'Core Mechanics & OOP', 
+    author: 'Abhiraj Singh', 
+    difficulty: 'intermediate', 
+    description: 'Deep dive into memory layout, stack vs heap, pointer arithmetic, references, pass-by-value vs reference, and memory leaks.',
+    subtopics: [
+      { id: 'memory-layout', title: '1. Memory Layout', file: 'topics/01a-memory-layout.md' },
+      { id: 'dynamic-allocation', title: '2. Dynamic Allocation', file: 'topics/01b-dynamic-allocation.md' },
+      { id: 'pointer-fundamentals', title: '3. Pointer Fundamentals', file: 'topics/01c-pointer-fundamentals.md' },
+      { id: 'references', title: '4. References', file: 'topics/01d-references.md' },
+      { id: 'passing-arguments', title: '5. Passing Arguments', file: 'topics/01e-passing-arguments.md' },
+      { id: 'placement-new', title: '6. Placement new', file: 'topics/01f-placement-new.md' }
+    ]
+  },
+  { id: '02-oops', title: 'Object-Oriented Programming in C++', file: 'topics/02-oops.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'beginner', description: 'Classes, inheritance, polymorphism, encapsulation, abstraction — the OOP pillars in C++ and how they work under the hood.' },
   { id: 'rvalue-move-semantics', title: 'Rvalue References, Move Semantics & Perfect Forwarding', file: 'topics/03-rvalue-references-move-semantics.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'advanced', description: 'Rvalue references, std::move, std::forward, reference collapsing rules, and writing move-aware classes.' },
   { id: 'const-static-volatile', title: 'const, static, volatile & Their Uses in Classes', file: 'topics/04-const-static-volatile.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'intermediate', description: 'Deep dive into const correctness, static members, volatile semantics, mutable keyword, and their interactions in class design.' },
   
@@ -49,7 +65,10 @@ const TOPICS = [
   
   // Concurrency (Unassigned)
   { id: 'concurrency-1', title: 'Concurrency Part 1 — Threads, Mutexes & Synchronization', file: 'topics/11-concurrency-1.md', category: 'Concurrency', author: 'TBD', difficulty: 'advanced', description: 'std::thread, mutexes, semaphores, latches, barriers, promise/future, condition variables, and thread-safe Singleton patterns.' },
-  { id: 'concurrency-2', title: 'Concurrency Part 2 — Atomics, Memory Model & Lock-Free', file: 'topics/12-concurrency-2.md', category: 'Concurrency', author: 'TBD', difficulty: 'advanced', description: 'std::atomic, C++ memory model, memory ordering (seq_cst, acquire-release, relaxed), memory fences, and lock-free programming.' }
+  { id: 'concurrency-2', title: 'Concurrency Part 2 — Atomics, Memory Model & Lock-Free', file: 'topics/12-concurrency-2.md', category: 'Concurrency', author: 'TBD', difficulty: 'advanced', description: 'std::atomic, C++ memory model, memory ordering (seq_cst, acquire-release, relaxed), memory fences, and lock-free programming.' },
+  
+  // New Topics
+  { id: '13-functors-and-lambdas', title: 'Functors & Lambdas', file: 'topics/13-functors-and-lambdas.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'intermediate', description: 'Function pointers, callable objects, functor classes, and lambda expressions — how they relate and when to use each.' }
 ];
 
 const CATEGORIES = [...new Set(TOPICS.map(t => t.category))];
