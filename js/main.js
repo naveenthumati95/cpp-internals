@@ -313,14 +313,14 @@ async function renderTopicPage(topicId, container) {
 
   // Breadcrumb + header
   let html = `
-    <div class="breadcrumb fade-in">
+    <div class="breadcrumb">
       <a href="#/">Home</a>
       <span class="separator">›</span>
       <span>${topic.category}</span>
       <span class="separator">›</span>
       <span class="current">${topic.title}</span>
     </div>
-    <div class="topic-page-header fade-in">
+    <div class="topic-page-header">
       <h1>${topic.title}</h1>
       <div class="topic-meta">
         <span class="tag">${topic.category}</span>
@@ -328,7 +328,7 @@ async function renderTopicPage(topicId, container) {
         <span class="read-time" id="readTime">⏱ Calculating...</span>
       </div>
     </div>
-    <div class="article-content fade-in" id="articleBody">
+    <div class="article-content" id="articleBody">
       <div class="loading-spinner"><div class="spinner"></div></div>
     </div>
   `;
@@ -343,7 +343,7 @@ async function renderTopicPage(topicId, container) {
   const prevTopic = currentIndex > 0 ? flatTopics[currentIndex - 1] : null;
   const nextTopic = currentIndex < flatTopics.length - 1 ? flatTopics[currentIndex + 1] : null;
 
-  html += `<div class="topic-navigation fade-in">`;
+  html += `<div class="topic-navigation">`;
   if (prevTopic) {
     html += `<a href="#/topic/${prevTopic.id}" class="nav-prev"><span class="nav-label">← Previous</span><span class="nav-title">${prevTopic.title}</span></a>`;
   } else {
