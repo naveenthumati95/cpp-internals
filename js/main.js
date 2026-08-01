@@ -73,7 +73,8 @@ function configureMarkdown() {
       if (typeof tokenOrHref === 'object' && tokenOrHref !== null) {
         href = tokenOrHref.href;
         title = tokenOrHref.title;
-        text = tokenOrHref.text;
+        // New Marked API: parse inline tokens for bold/italic text inside links
+        text = (this.parser && tokenOrHref.tokens) ? this.parser.parseInline(tokenOrHref.tokens) : tokenOrHref.text;
       } else {
         href = tokenOrHref;
         title = possibleTitle;
