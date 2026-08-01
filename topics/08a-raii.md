@@ -1,82 +1,73 @@
-**RAII** stands for **Resource Acquisition is Intitialization**. Which means "**Acquire the resource during object initialization (construction), and release it automatically when the object is destroyed**". It is an **Idiom** (**commonly accepted programming technique or pattern** used to solve a recurring problem in a language).
+**RAII** stands for **Resource Acquisition is Initialization**. This means: **"Acquire the resource during object initialization (construction), and release it automatically when the object is destroyed"**. It is an **idiom** (a commonly accepted programming technique) used to solve a recurring problem in C++.
 
-> Resource lifetime is object lifetime.
+> Resource lifetime is tied directly to object lifetime.
 
-Here the word **Resource** can be anything that must be acquired and later released, such as:
-
+Here, the word **Resource** refers to anything that must be acquired and later released, such as:
 - Heap memory (`new`/`delete`)
-
 - Files (`fopen`/`fclose`)
-
 - Mutexes (`lock`/`unlock`)
-
-- Sockets
-
+- Network Sockets
 - Threads
 
-> RAII is not only applicable for memory.
+> RAII is not only applicable to memory—it is the foundation of all resource management in C++.
 
 #### Example
 
 Without **RAII**:
-
 ```cpp
-FILE* file = fopen("cc.txt", "r");
+FILE* file = fopen("data.txt", "r");
 
 // ... use file ...
 
-flcose(file); // Easy to forget!
+fclose(file); // Easy to forget!
 ```
-
-If an exception occurs before `fclose`, the file leaks.
+If an exception occurs before `fclose`, or if a developer adds an early `return` statement, the file handle leaks.
 
 With **RAII**:
-
 ```cpp
-class File{
+#include <stdexcept>
+
+class File {
 public:
-    File(const char* name)
-    {
+    File(const char* name) {
         fp = fopen(name, "r"); // Acquire
+        if (!fp) {
+            throw std::runtime_error("Failed to open file");
+        }
     }
     
-    ~File()
-    {
-        fclose(fp); // Release
+    ~File() {
+        if (fp) {
+            fclose(fp); // Release
+        }
     }
 private:
     FILE* fp;
-}
+    
+    // WARNING: This class is still unsafe if copied! (See Rule of Five below)
+};
 
-
-void foo()
-{
+void foo() {
     File file("data.txt");
-    // Use the file.
-} // Destructor automatically closes the file. No need to worry :)
+    // Use the file...
+} // Destructor automatically closes the file. No need to worry!
 ```
+No matter how `foo()` exits—whether via a normal return, an exception, or an early return—the destructor is guaranteed to run and the file is safely closed.
 
-No matter how `foo()` exits: normal return, exception, or early return, the destructor runs and the file is closed.
+The **RAII** idiom consists of three core steps:
+- **Encapsulate** a resource into a class (acquire in constructor).
+- **Use** the resource via a local, stack-allocated instance of the class.
+- **Release** the resource automatically when the object goes out of scope (destructor).
 
-**RAII** idiom consists in three steps:
+> **What is Garbage Collection (GC)?**
+> Garbage collection is a technique used in languages like Java or C# where the runtime periodically pauses execution to automatically find and free memory that is no longer being used.
 
-- Encapsulate a resource into a class (constructor).
+Unlike Java, C++ doesn't have (or need) a garbage collector. 
 
-- Use the resource via a local instance of the class.
-
-- The resource is automatically released when object gets out of scope (destructor).
-
-> What is Garbage collection (GC)?
-> 
-> Garbage collection (GC) is a technique where the runtime automatically finds and frees memory that is no longer being used by the program.
-
-Unfortunately unlike Java, C++ doesn't have a garbage collector.
-
-Implications of **RAII**:
-
-- C++ programming language does not require the garbage collector!!
-
-- The programmer has the responsibility to manage the resources.
+**Implications of RAII:**
+- Deterministic destruction eliminates the need for non-deterministic garbage collection.
+- Developers have exact, predictable control over when resources are released (crucial for performance and hardware constraints).
+- The programmer's responsibility shifts from *managing resources manually* to *designing robust RAII classes*.
 
 ---
 
