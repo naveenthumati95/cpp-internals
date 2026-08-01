@@ -956,7 +956,7 @@ function setupScrollAnimations() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
+  }, { rootMargin: '50px' });
 
   elements.forEach(el => observer.observe(el));
 }
