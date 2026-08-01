@@ -11,7 +11,7 @@
 const CONTRIBUTORS = [
   { name: 'Naveen Thumati', role: 'Core Contributor', github: 'naveenthumati95', linkedin: 'https://www.linkedin.com/in/naveenthumati95/', avatar: null, bio: 'Diving deep into systems programming and C++ architecture.' },
   { name: 'Aryan Chakravorty', role: 'Core Contributor', github: 'aryanchakravorty', linkedin: 'https://www.linkedin.com/in/aryan-chakravorty-414118357/', avatar: null, bio: 'Exploring the depths of modern C++ internals.' },
-  { name: 'Abhiraj Singh', role: 'Core Contributor', github: 'abhirajsingh', linkedin: 'https://www.linkedin.com/in/abhirajsingh154/', avatar: null, bio: 'Passionate about understanding C++ from the ground up.' }
+  { name: 'Abhiraj Singh', role: 'Core Contributor', github: 'abhiraj-singh-154', linkedin: 'https://www.linkedin.com/in/abhirajsingh154/', avatar: null, bio: 'Passionate about understanding C++ from the ground up.' }
 ];
 
 const TOPICS = [
