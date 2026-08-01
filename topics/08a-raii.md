@@ -162,6 +162,56 @@ As mentioned, RAII extends far beyond simple memory allocation. The C++ Standard
 - **File I/O (`std::fstream`):** Opens a file handle in the constructor and automatically closes it in the destructor.
 - **Memory (`std::vector` / `std::string`):** Manages internal dynamic heap arrays, automatically reallocating when necessary and freeing the memory upon destruction.
 
+### Advanced Pitfalls in RAII
+
+Even with RAII, there are a few dangerous traps that can catch experienced C++ developers off guard.
+
+#### 1. The "Unnamed Temporary" Bug
+When using an RAII wrapper like a mutex lock, you must give the object a variable name. If you don't, the compiler creates a *temporary* object that is destroyed at the end of the exact same statement!
+
+```cpp
+std::mutex m;
+
+void bad_function() {
+    // BUG: Creates a temporary lock that is instantly destroyed!
+    std::lock_guard<std::mutex>(m); 
+    
+    // This code is completely unprotected!
+    shared_data++; 
+}
+
+void good_function() {
+    // CORRECT: The 'lock' variable lives until the end of the scope
+    std::lock_guard<std::mutex> lock(m); 
+    
+    shared_data++;
+}
+```
+*Tip: Modern C++ libraries often use the `[[nodiscard]]` attribute on RAII types to force a compiler warning if you forget to assign or name the variable.*
+
+#### 2. The "Multiple Resources" Trap
+What happens if your class attempts to acquire *two* raw resources manually in its constructor?
+
+```cpp
+class TwoFiles {
+    FILE* f1;
+    FILE* f2;
+public:
+    TwoFiles(const char* name1, const char* name2) {
+        f1 = fopen(name1, "r"); // Resource 1 acquired
+        f2 = fopen(name2, "r"); // What if this fails and throws an exception?
+    }
+    ~TwoFiles() {
+        if (f1) fclose(f1);
+        if (f2) fclose(f2);
+    }
+};
+```
+If the second `fopen` fails and an exception is thrown, **the constructor never finishes**. In C++, if a constructor does not complete, the destructor is **never called** for that object. This means `f1` will leak forever!
+
+**The Fix:**
+A single class should only ever be responsible for managing exactly *one* raw resource. If you need two files, you should use two distinct RAII wrapper objects (or Smart Pointers) as member variables. If an exception occurs during construction, C++ guarantees that the destructors for all *fully-constructed* member variables will run automatically, preventing the leak.
+
 ### Enter Smart Pointers
 
 Writing custom RAII wrappers (like the `FileDescriptor` challenge above) for every single resource gets tedious. For the most common resource of all—**dynamically allocated memory on the heap**—C++ provides ready-to-use RAII templates known as **Smart Pointers**.
