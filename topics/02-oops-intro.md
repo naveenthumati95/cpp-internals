@@ -1,18 +1,14 @@
 # Object-Oriented Programming in C++
 
-> 🚧 This article is currently being written. Check back soon!
-
-## Overview
-
-Coming soon...
-
 ## Prerequisites
 
 - Basic C++ knowledge
 
 ## Topics Covered
 
-- TBD
+- Structure memory layout and alignment
+
+- Classes and Access Modifiers
 
 ---
 *Last updated: July 2026*

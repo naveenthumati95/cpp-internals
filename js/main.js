@@ -33,7 +33,19 @@ const TOPICS = [
       { id: 'placement-new', title: '6. Placement new', file: 'topics/01f-placement-new.md' }
     ]
   },
-  { id: '02-oops', title: 'Object-Oriented Programming in C++', file: 'topics/02-oops.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'beginner', description: 'Classes, inheritance, polymorphism, encapsulation, abstraction — the OOP pillars in C++ and how they work under the hood.' },
+  { 
+    id: '02-oops', 
+    title: 'Object-Oriented Programming in C++', 
+    file: 'topics/02-oops-intro.md', 
+    category: 'Core Mechanics & OOP', 
+    author: 'Abhiraj Singh', 
+    difficulty: 'beginner', 
+    description: 'Classes, inheritance, polymorphism, encapsulation, abstraction — the OOP pillars in C++ and how they work under the hood.',
+    subtopics: [
+      { id: 'struct-and-its-size', title: '1. Structure and its Size', file: 'topics/02a-struct-and-its-size.md' },
+      { id: 'access-modifiers', title: '2. Classes and Access Modifiers', file: 'topics/02b-access-modifiers.md' }
+    ]
+  },
   { id: 'rvalue-move-semantics', title: 'Rvalue References, Move Semantics & Perfect Forwarding', file: 'topics/03-rvalue-references-move-semantics.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'advanced', description: 'Rvalue references, std::move, std::forward, reference collapsing rules, and writing move-aware classes.' },
   { id: 'const-static-volatile', title: 'const, static, volatile & Their Uses in Classes', file: 'topics/04-const-static-volatile.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'intermediate', description: 'Deep dive into const correctness, static members, volatile semantics, mutable keyword, and their interactions in class design.' },
   
