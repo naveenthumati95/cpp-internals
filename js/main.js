@@ -359,8 +359,8 @@ async function renderTopicPage(topicId, container) {
   // Fetch markdown content
   const articleBody = document.getElementById('articleBody');
   try {
-    const response = await fetch(topic.file);
-    if (!response.ok) throw new Error('Not found');
+    const response = await fetch(topic.file, { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Network response was not ok');
     const mdText = await response.text();
 
     // Check if it's just a placeholder
