@@ -43,7 +43,8 @@ const TOPICS = [
     description: 'Classes, inheritance, polymorphism, encapsulation, abstraction — the OOP pillars in C++ and how they work under the hood.',
     subtopics: [
       { id: 'struct-and-its-size', title: '1. Structure and its Size', file: 'topics/02a-struct-and-its-size.md' },
-      { id: 'access-modifiers', title: '2. Classes and Access Modifiers', file: 'topics/02b-access-modifiers.md' }
+      { id: 'access-modifiers', title: '2. Classes and Access Modifiers', file: 'topics/02b-access-modifiers.md' },
+      { id: 'inheritance', title: '3. Inheritance', file: 'topics/02c-inheritance.md' }
     ]
   },
   { id: 'rvalue-move-semantics', title: 'Rvalue References, Move Semantics & Perfect Forwarding', file: 'topics/03-rvalue-references-move-semantics.md', category: 'Core Mechanics & OOP', author: 'Abhiraj Singh', difficulty: 'advanced', description: 'Rvalue references, std::move, std::forward, reference collapsing rules, and writing move-aware classes.' },
