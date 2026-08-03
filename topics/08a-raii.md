@@ -3,6 +3,7 @@
 > Resource lifetime is tied directly to object lifetime.
 
 Here, the word **Resource** refers to anything that must be acquired and later released, such as:
+
 - Heap memory (`new`/`delete`)
 - Files (`fopen`/`fclose`)
 - Mutexes (`lock`/`unlock`)
@@ -14,6 +15,7 @@ Here, the word **Resource** refers to anything that must be acquired and later r
 #### Example
 
 Without **RAII**:
+
 ```cpp
 FILE* file = fopen("data.txt", "r");
 
@@ -21,9 +23,11 @@ FILE* file = fopen("data.txt", "r");
 
 fclose(file); // Easy to forget!
 ```
+
 If an exception occurs before `fclose`, or if a developer adds an early `return` statement, the file handle leaks.
 
 With **RAII**:
+
 ```cpp
 #include <stdexcept>
 
@@ -35,7 +39,7 @@ public:
             throw std::runtime_error("Failed to open file");
         }
     }
-    
+
     ~File() {
         if (fp) {
             fclose(fp); // Release
@@ -43,7 +47,7 @@ public:
     }
 private:
     FILE* fp;
-    
+
     // WARNING: This class is still unsafe if copied! (See Rule of Five below)
 };
 
@@ -52,9 +56,11 @@ void foo() {
     // Use the file...
 } // Destructor automatically closes the file. No need to worry!
 ```
+
 No matter how `foo()` exits—whether via a normal return, an exception, or an early return—the destructor is guaranteed to run and the file is safely closed.
 
 The **RAII** idiom consists of three core steps:
+
 - **Encapsulate** a resource into a class (acquire in constructor).
 - **Use** the resource via a local, stack-allocated instance of the class.
 - **Release** the resource automatically when the object goes out of scope (destructor).
@@ -65,6 +71,7 @@ The **RAII** idiom consists of three core steps:
 Unlike Java, C++ doesn't have (or need) a garbage collector. 
 
 **Implications of RAII:**
+
 - Deterministic destruction eliminates the need for non-deterministic garbage collection.
 - Developers have exact, predictable control over when resources are released (crucial for performance and hardware constraints).
 - The programmer's responsibility shifts from *managing resources manually* to *designing robust RAII classes*.
@@ -78,6 +85,7 @@ When you write an RAII class, encapsulating the resource in the constructor and 
 By default, the compiler generates shallow copies. For resources like heap memory or file descriptors, a shallow copy means two objects now claim ownership of the *exact same resource*, leading directly to a **double-free** or **use-after-free** bug when their destructors run!
 
 To fix this, you must explicitly define the **Rule of Five**:
+
 1. Destructor
 2. Copy Constructor
 3. Copy Assignment Operator
@@ -92,6 +100,7 @@ To truly understand RAII, let's write a wrapper class for a low-level UNIX file 
 > Create a class called `FileDescriptor` that wraps a raw `int fd`. 
 > 
 > **Requirements:**
+> 
 > 1. The constructor should accept the `fd`.
 > 2. The destructor should automatically call `close_fd(fd)` (assume this function exists).
 > 3. **Copying** a file descriptor doesn't make sense (you shouldn't have two objects closing the same `fd`). Prevent copying entirely.
@@ -152,6 +161,7 @@ public:
     int get() const { return m_fd; }
 };
 ```
+
 </details>
 
 ### Common Examples of RAII
@@ -167,6 +177,7 @@ As mentioned, RAII extends far beyond simple memory allocation. The C++ Standard
 Even with RAII, there are a few dangerous traps that can catch experienced C++ developers off guard.
 
 #### 1. The "Unnamed Temporary" Bug
+
 When using an RAII wrapper like a mutex lock, you must give the object a variable name. If you don't, the compiler creates a *temporary* object that is destroyed at the end of the exact same statement!
 
 ```cpp
@@ -175,7 +186,7 @@ std::mutex m;
 void bad_function() {
     // BUG: Creates a temporary lock that is instantly destroyed!
     std::lock_guard<std::mutex>(m); 
-    
+
     // This code is completely unprotected!
     shared_data++; 
 }
@@ -183,13 +194,15 @@ void bad_function() {
 void good_function() {
     // CORRECT: The 'lock' variable lives until the end of the scope
     std::lock_guard<std::mutex> lock(m); 
-    
+
     shared_data++;
 }
 ```
+
 *Tip: Modern C++ libraries often use the `[[nodiscard]]` attribute on RAII types to force a compiler warning if you forget to assign or name the variable.*
 
 #### 2. The "Multiple Resources" Trap
+
 What happens if your class attempts to acquire *two* raw resources manually in its constructor?
 
 ```cpp
@@ -207,6 +220,7 @@ public:
     }
 };
 ```
+
 If the second `fopen` fails and an exception is thrown, **the constructor never finishes**. In C++, if a constructor does not complete, the destructor is **never called** for that object. This means `f1` will leak forever!
 
 **The Fix:**
@@ -217,6 +231,7 @@ A single class should only ever be responsible for managing exactly *one* raw re
 Writing custom RAII wrappers (like the `FileDescriptor` challenge above) for every single resource gets tedious. For the most common resource of all—**dynamically allocated memory on the heap**—C++ provides ready-to-use RAII templates known as **Smart Pointers**.
 
 Instead of writing your own wrapper around raw pointers, you simply use:
+
 1. `std::unique_ptr`: For exclusive, non-copyable ownership (just like our FileDescriptor!).
 2. `std::shared_ptr`: For shared ownership with internal reference counting.
 3. `std::weak_ptr`: A companion to `shared_ptr` to observe memory without affecting the reference count.
