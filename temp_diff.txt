@@ -1,0 +1,270 @@
+The following changes were made by the USER to: /Users/abhirajsingh/cpp-internals/topics/02-oops-intro.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -295,6 +295,622 @@
+ ---
+ 
+ Logic of virtualisation->
++Step 1: The Problem Without virtual
++
++Consider the following program:
++
++class Animal {
++public:
++    void sound() {
++        cout << "Animal";
++    }
++};
++
++class Dog : public Animal {
++public:
++    void sound() {
++        cout << "Dog";
++    }
++};
++Animal* p = new Dog();
++p->sound();
++Question:
++
++What should be printed?
++
++Many beginners expect
++
++Dog
++
++But the actual output is
++
++Animal
++Why?
++
++At compile time, the compiler only knows
++
++Animal* p;
++
++The compiler does not know what object p will point to while the program is running.
++
++Therefore, it decides
++
++Pointer type = Animal*
++
++↓
++
++Call Animal::sound()
++
++This is called
++
++Static Binding (Compile-time Binding)
++
++Step 2: Why is this a Problem?
++
++Suppose we are creating a Zoo Management System.
++
++            Animal
++               ▲
++      ┌────────┼────────┐
++      │        │        │
++     Dog      Cat      Cow
++
++Now we write
++
++Animal* p;
++
++Later,
++
++p = new Dog();
++
++or
++
++p = new Cat();
++
++or
++
++p = new Cow();
++
++Finally,
++
++p->sound();
++Desired Output
++Dog → Bark
++
++Cat → Meow
++
++Cow → Moo
++Problem
++
++At compile time the compiler cannot know
++
++Dog?
++Cat?
++Cow?
++
++because the decision depends on runtime.
++
++Step 3: Solution → virtual Keyword
++
++Now we modify the base class.
++
++class Animal
++{
++public:
++
++    virtual void sound()
++    {
++        cout<<"Animal";
++    }
++
++};
++
++Only one keyword changes.
++
++virtual
++
++This keyword tells the compiler
++
++"Do NOT decide now."
++
++"Wait until runtime."
++
++Step 4: Compiler Detects a Virtual Function
++
++While compiling,
++
++the compiler notices
++
++Animal has a virtual function.
++
++Immediately,
++
++it creates a special table.
++
++This table is called
++
++Virtua
+<truncated 4174 bytes>
+
++
++↓
++
++Dog
++
++Later
++
++p=&c;
++p
++
++↓
++
++Cat object
++
++↓
++
++Cat vtable
++
++↓
++
++Cat::sound()
++
++↓
++
++Cat
++
++Notice
++
++The code
++
++p->sound();
++
++never changes.
++
++Only
++
++the object changes.
++
++Step 15: Why Isn't the Decision Made at Compile Time?
++
++Consider
++
++Animal* p;
++
++if(choice==1)
++
++    p=new Dog();
++
++else
++
++    p=new Cat();
++
++p->sound();
++
++At compile time,
++
++compiler cannot know
++
++choice
++
++because
++
++choice
++
++↓
++
++depends on user input
++
++↓
++
++available only during execution
++
++Therefore,
++
++compile-time binding is impossible.
++
++Runtime binding is necessary.
++
++Complete Flow Diagram
++Program Starts
++       │
++       ▼
++Compiler sees virtual function
++       │
++       ▼
++Compiler creates vtable
++       │
++       ▼
++Compiler adds hidden vptr to every object
++       │
++       ▼
++Object is created
++       │
++       ▼
++Constructor initializes vptr
++       │
++       ▼
++Base pointer points to object
++       │
++       ▼
++Virtual function called
++       │
++       ▼
++Read object's vptr
++       │
++       ▼
++Go to vtable
++       │
++       ▼
++Find correct function address
++       │
++       ▼
++Execute overridden function
++Key Points to Remember
++virtual tells the compiler to use runtime dispatch.
++The compiler creates one vtable per polymorphic class during compilation.
++Each object of such a class contains a hidden vptr.
++The constructor initializes the vptr to the class's vtable.
++A virtual function call is resolved by following:
++object → vptr → vtable → function address → execute function.
++This mechanism allows the same base pointer or reference to invoke different overridden functions depending on the actual object type, which is the essence of runtime polymorphism.
+ 
+ *Last updated: July 2026*
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.

@@ -1,0 +1,386 @@
+formatted_text = """### Step 1: The Problem Without virtual
+
+Consider the following program:
+
+```cpp
+class Animal {
+public:
+    void sound() {
+        cout << "Animal";
+    }
+};
+
+class Dog : public Animal {
+public:
+    void sound() {
+        cout << "Dog";
+    }
+};
+
+Animal* p = new Dog();
+p->sound();
+```
+
+**Question:**
+What should be printed?
+
+Many beginners expect: `Dog`
+But the actual output is: `Animal`
+
+**Why?**
+At compile time, the compiler only knows:
+```cpp
+Animal* p;
+```
+The compiler does not know what object `p` will point to while the program is running.
+
+Therefore, it decides:
+`Pointer type = Animal*` → `Call Animal::sound()`
+
+This is called **Static Binding (Compile-time Binding)**.
+
+### Step 2: Why is this a Problem?
+
+Suppose we are creating a Zoo Management System.
+```text
+            Animal
+               ▲
+      ┌────────┼────────┐
+      │        │        │
+     Dog      Cat      Cow
+```
+
+Now we write:
+```cpp
+Animal* p;
+```
+
+Later, `p = new Dog();` or `p = new Cat();` or `p = new Cow();`
+
+Finally, `p->sound();`
+
+**Desired Output:**
+- Dog → Bark
+- Cat → Meow
+- Cow → Moo
+
+**Problem:**
+At compile time the compiler cannot know: Dog? Cat? Cow?
+because the decision depends on runtime.
+
+### Step 3: Solution → virtual Keyword
+
+Now we modify the base class.
+
+```cpp
+class Animal {
+public:
+    virtual void sound() {
+        cout<<"Animal";
+    }
+};
+```
+
+Only one keyword changes: `virtual`.
+
+This keyword tells the compiler:
+"Do NOT decide now. Wait until runtime."
+
+### Step 4: Compiler Detects a Virtual Function
+
+While compiling, the compiler notices `Animal` has a virtual function.
+
+Immediately, it creates a special table. This table is called the **Virtual Table (vtable)**.
+
+### Step 5: Compiler Creates the vtable
+
+For class `Animal`:
+```cpp
+class Animal {
+public:
+    virtual void sound();
+};
+```
+
+Compiler creates `Animal vtable`:
+```text
++---------------------------+
+| sound → Animal::sound()   |
++---------------------------+
+```
+
+**Notice:**
+The vtable stores addresses of virtual functions. It does not store data members.
+
+### Step 6: Derived Class is Compiled
+
+Now compiler sees:
+```cpp
+class Dog : public Animal {
+public:
+    void sound() override {
+        cout<<"Dog";
+    }
+};
+```
+
+Compiler again creates another table, the `Dog vtable`:
+```text
++-------------------------+
+| sound → Dog::sound()    |
++-------------------------+
+```
+
+Now there are `Animal vtable` and `Dog vtable`.
+Each polymorphic class gets its own vtable.
+
+### Step 7: Where is the vtable Stored?
+
+The vtable is created only once per class. It is NOT inside every object.
+
+Usually, it is stored in **Program Memory**:
+
+```text
+-----------------------------
+Code Section
+
+Animal::sound()
+Dog::sound()
+-----------------------------
+Read Only Section
+
+Animal vtable
+Dog vtable
+-----------------------------
+```
+
+So, 1000 `Dog` objects still share only one `Dog vtable`.
+
+### Step 8: Compiler Adds a Hidden Pointer
+
+Now suppose we create:
+```cpp
+Dog d;
+```
+
+You think the object looks like:
+```text
+Dog Object
++-----------+
+| data      |
++-----------+
+```
+
+Actually, compiler secretly changes it to:
+```text
+Dog Object
++-----------+
+| vptr      |   ← hidden pointer
++-----------+
+| data      |
++-----------+
+```
+
+This hidden pointer is called the **vptr (Virtual Pointer)**.
+
+You never write it. Compiler inserts it automatically.
+
+### Step 9: Object Construction
+
+When `Dog d;` is created, the constructor secretly performs: `vptr = Address of Dog vtable`.
+
+Memory becomes:
+```text
+Dog Object
++-----------+
+| vptr -----|----------------+
++-----------+                |
+| data      |                |
++-----------+                |
+                             |
+                      Dog vtable
+                 sound → Dog::sound()
+```
+
+Similarly, if `Animal a;`, then:
+```text
+Animal Object
++-----------+
+| vptr -----|------------+
++-----------+            |
+| data      |            |
++-----------+            |
+                          |
+                    Animal vtable
+               sound → Animal::sound()
+```
+
+### Step 10: Base Pointer Refers to Derived Object
+
+Now:
+```cpp
+Animal* p;
+Dog d;
+p = &d;
+```
+
+Memory:
+```text
+            p
+            |
+            ▼
+        Dog Object
++-------------------+
+| vptr ------------ |--------------------+
++-------------------+                    |
+| data              |                    |
++-------------------+                    |
+                                         ▼
+                                   Dog vtable
+                           sound → Dog::sound()
+```
+
+**Notice:**
+Although `Pointer type = Animal*`, the object is actually `Dog`.
+
+### Step 11: Calling the Virtual Function
+
+Now we execute:
+```cpp
+p->sound();
+```
+
+Compiler does NOT directly call `Animal::sound()`.
+Instead, compiler generates code similar to:
+1. **Step 1:** Go to the object
+2. **Step 2:** Read object's vptr
+3. **Step 3:** Follow the vptr
+4. **Step 4:** Reach the vtable
+5. **Step 5:** Find entry for `sound()`
+6. **Step 6:** Call the function stored there
+
+### Step 12: Runtime Dispatch
+
+Current object: `Dog`.
+`Dog` object's vptr points to `Dog vtable`.
+`Dog vtable` contains `sound() → Dog::sound()`.
+
+Therefore, `Dog::sound()` is executed.
+Output: `Dog`.
+
+This entire decision happens during runtime.
+This is called **Dynamic Dispatch** or **Runtime Polymorphism**.
+
+### Step 13: Another Example
+
+Suppose:
+```cpp
+Animal* p;
+Animal a;
+p = &a;
+```
+
+Memory: `Animal Object` vptr → `Animal vtable` → `Animal::sound()`.
+Execution: `p->sound()` → `Animal::sound()` → Output: `Animal`.
+
+### Step 14: Changing the Object Changes the Function
+
+```cpp
+Animal* p;
+Dog d;
+Cat c;
+```
+
+**Initially:** `p=&d;`
+`p` → `Dog object` → `Dog vtable` → `Dog::sound()` → `Dog`.
+
+**Later:** `p=&c;`
+`p` → `Cat object` → `Cat vtable` → `Cat::sound()` → `Cat`.
+
+**Notice:**
+The code `p->sound();` never changes.
+Only the object changes.
+
+### Step 15: Why Isn't the Decision Made at Compile Time?
+
+Consider:
+```cpp
+Animal* p;
+
+if(choice==1)
+    p=new Dog();
+else
+    p=new Cat();
+
+p->sound();
+```
+
+At compile time, compiler cannot know `choice` because `choice` depends on user input, available only during execution.
+
+Therefore, compile-time binding is impossible. Runtime binding is necessary.
+
+### Complete Flow Diagram
+
+```text
+Program Starts
+       │
+       ▼
+Compiler sees virtual function
+       │
+       ▼
+Compiler creates vtable
+       │
+       ▼
+Compiler adds hidden vptr to every object
+       │
+       ▼
+Object is created
+       │
+       ▼
+Constructor initializes vptr
+       │
+       ▼
+Base pointer points to object
+       │
+       ▼
+Virtual function called
+       │
+       ▼
+Read object's vptr
+       │
+       ▼
+Go to vtable
+       │
+       ▼
+Find correct function address
+       │
+       ▼
+Execute overridden function
+```
+
+### Key Points to Remember
+
+- `virtual` tells the compiler to use runtime dispatch.
+- The compiler creates one vtable per polymorphic class during compilation.
+- Each object of such a class contains a hidden `vptr`.
+- The constructor initializes the `vptr` to the class's vtable.
+- A virtual function call is resolved by following: `object → vptr → vtable → function address → execute function`.
+- This mechanism allows the same base pointer or reference to invoke different overridden functions depending on the actual object type, which is the essence of runtime polymorphism.
+"""
+
+with open("/Users/abhirajsingh/cpp-internals/topics/02-oops-intro.md", "r") as f:
+    content = f.read()
+
+start_marker = "### Step 1: The Problem Without virtual"
+end_marker = "## Important Rules for Virtual Functions"
+
+start_idx = content.find(start_marker)
+end_idx = content.find(end_marker)
+
+if start_idx != -1 and end_idx != -1:
+    new_content = content[:start_idx] + formatted_text + "\n\n" + content[end_idx:]
+    with open("/Users/abhirajsingh/cpp-internals/topics/02-oops-intro.md", "w") as f:
+        f.write(new_content)
+    print("Format applied successfully!")
+else:
+    print("Could not find markers.")

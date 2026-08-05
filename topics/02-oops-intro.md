@@ -6,6 +6,7 @@
 ## Topics Covered
 - Structure memory layout and alignment
 - Classes and Access Modifiers
+- Rule of Five
 - Inheritance
 - Polymorphism
 
