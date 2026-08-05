@@ -19,7 +19,7 @@ There are four smart pointers in C++11:
 - `std::shared_ptr`
 - `std::weak_ptr`
 
-> [!WARNING]
+> **Warning:**
 > `std::auto_ptr` co-opted its copy operations for moves. This led to surprising code (copying a `std::auto_ptr` sets it to null!) and frustrating usage restrictions (e.g., it’s not possible to store `std::auto_ptr`s in containers).
 > 
 > `std::unique_ptr` does everything `std::auto_ptr` does, plus more. So, it's better than `std::auto_ptr` in every way. You should replace `std::auto_ptr` with `std::unique_ptr` and never look back.
@@ -154,8 +154,7 @@ public:
 };
 ```
 
-> [!TIP]
-> **The Size of Custom Deleters:**
+> **Tip: The Size of Custom Deleters:**
 > With the default deleter (`delete`), a `std::unique_ptr` is typically the same size as a raw pointer. However, custom deleters can increase its size. A **function-pointer** deleter usually doubles the size (from one word to two), while a function-object deleter’s size depends on its stored state. 
 > 
 > **Captureless lambdas are stateless, so they add no size overhead**, making them preferable to function pointers when possible!
@@ -192,7 +191,7 @@ Function-object deleters that store a lot of state can make `std::unique_ptr` ob
 
 `std::unique_ptr` has two forms: one for single objects (`std::unique_ptr<T>`) and one for arrays (`std::unique_ptr<T[]>`). This eliminates any ambiguity about what it owns, and each form provides only the operations that make sense. The single-object version supports `operator*` and `operator->` but not `operator[]`, while the array version provides `operator[]` but not dereferencing operators.
 
-> [!NOTE]
+> **Note:**
 > In practice, the array form is rarely needed because `std::vector`, `std::array`, and `std::string` are almost always better choices than raw arrays. A `std::unique_ptr<T[]>` is mainly useful when working with a C-style API that returns a raw pointer to a heap-allocated array whose ownership you need to take.
 
 ---
@@ -285,6 +284,78 @@ public:
 
 ---
 
+## Challenge 2: The Pimpl Idiom
+
+One of the most powerful architectural patterns in C++ is the **Pimpl (Pointer to Implementation) Idiom**. It is used to achieve ABI stability and dramatically speed up compilation times by completely hiding private class members from the header file.
+
+> **The Prompt:**
+> You are building a high-performance library and want to expose a `Widget` class. `Widget` relies on complex internal state (`std::vector<int>`, custom cache objects, etc.). 
+> 
+> Using `std::unique_ptr`, implement `Widget.h` and `Widget.cpp` such that **no internal state details leak into the header**, allowing client code to `#include "Widget.h"` without pulling in any heavy dependencies.
+> 
+> *Hint: Refer to Advanced Question 2 regarding incomplete types!*
+
+<details>
+<summary>View the Solution</summary>
+
+**Widget.h (The Header File)**
+```cpp
+#pragma once
+#include <memory>
+
+class Widget {
+public:
+    Widget();
+    ~Widget(); // CRUCIAL: Must be declared here, but NOT defined inline!
+
+    // Prevent copying because the default copy constructor 
+    // would try to copy the unique_ptr (which fails).
+    Widget(const Widget&) = delete;
+    Widget& operator=(const Widget&) = delete;
+
+    // Allow moving
+    Widget(Widget&&) noexcept;
+    Widget& operator=(Widget&&) noexcept;
+
+    void doWork();
+
+private:
+    struct Impl; // Forward declaration (Incomplete Type)
+    std::unique_ptr<Impl> pImpl;
+};
+```
+
+**Widget.cpp (The Source File)**
+```cpp
+#include "Widget.h"
+#include <vector>
+#include <string>
+#include <iostream>
+
+// Full definition of Impl is hidden away in the .cpp file!
+struct Widget::Impl {
+    std::vector<int> heavyData;
+    std::string internalState;
+};
+
+Widget::Widget() : pImpl(std::make_unique<Impl>()) {}
+
+// CRUCIAL: Define the destructor HERE, where Impl is a complete type.
+// The default deleter inside unique_ptr can now safely compute sizeof(Impl).
+Widget::~Widget() = default; 
+
+Widget::Widget(Widget&&) noexcept = default;
+Widget& operator=(Widget&&) noexcept = default;
+
+void Widget::doWork() {
+    pImpl->heavyData.push_back(42);
+    std::cout << "Working with hidden data!\n";
+}
+```
+</details>
+
+---
+
 ## Dangerous Pitfalls
 
 While `std::unique_ptr` protects against most memory leaks, it is not invincible. Here are the most dangerous traps advanced developers fall into.
@@ -299,6 +370,7 @@ std::unique_ptr<int> p2(raw); // FATAL BUG
 ```
 Both `p1` and `p2` think they have exclusive ownership. When they go out of scope, they will both attempt to `delete` the same memory address, crashing your program. 
 *(Solution: Always use `std::make_unique` instead of raw `new`).*
+> **Warning:** Always use `std::make_unique` instead of raw `new`.
 
 ### 2. Dangling from `.get()`
 The `.get()` method exists to interface with legacy C-APIs that require raw pointers. **Never store the result of `.get()`**.
