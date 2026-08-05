@@ -67,6 +67,82 @@ process(std::move(p)); // Compiles! Ownership is transferred to the function.
 
 ---
 
+### Advanced Question 1: Returning by Value and RVO
+
+**Question:** When returning a local `std::unique_ptr` from a function, should you explicitly write `return std::move(ptr);`?
+
+<details>
+<summary>View Answer</summary>
+
+**Answer: No! Never `std::move` a local return variable.**
+
+Using `std::move` on a local variable in a return statement is an anti-pattern. C++ rules dictate that local variables being returned by value are automatically treated as rvalues. 
+
+Furthermore, explicitly writing `std::move` disables **Return Value Optimization (RVO / NRVO)**, forcing the compiler to actually execute the move constructor instead of constructing the object directly in the caller's stack frame. By writing `return ptr;`, you get the fastest possible code.
+</details>
+
+---
+
+### Advanced Question 2: Incomplete Types
+
+**Question:** Can you define a class member like `std::unique_ptr<Widget> pWidget;` if `Widget` is only forward-declared (an incomplete type)?
+
+<details>
+<summary>View Answer</summary>
+
+**Answer: Yes, but with a critical caveat.**
+
+You can declare the `unique_ptr` member, but you **cannot destroy it** while `Widget` is incomplete. The compiler’s default deleter requires `sizeof(Widget)` and calls `delete`, which fails to compile on an incomplete type. 
+
+If you do this, you **must** explicitly define the destructor of the containing class in the `.cpp` file where `Widget` is fully defined, even if the destructor does nothing (`~MyClass() = default;`).
+</details>
+
+---
+
+### Advanced Question 3: Vector Reallocation & `noexcept`
+
+**Question:** If you store `std::unique_ptr` objects inside a `std::vector`, what happens when the vector runs out of capacity and needs to reallocate its internal buffer? How does the `noexcept` specifier play into this?
+
+<details>
+<summary>View Answer</summary>
+
+**Answer:** During reallocation, `std::vector` will allocate a larger buffer and move the elements over. 
+
+However, `std::vector` provides the **strong exception guarantee**. If an exception is thrown during reallocation, the vector must remain unchanged. Because moving elements alters the original objects, `std::vector` will *only* use move constructors if they are marked `noexcept`. If the move constructor is not `noexcept`, the vector falls back to **copying** the elements.
+
+Since `std::unique_ptr` cannot be copied, if it is stored inside a custom class whose move constructor is not `noexcept`, `std::vector` will try to copy it during reallocation and trigger a massive **compilation error**. Always mark your move constructors `noexcept`!
+</details>
+
+---
+
+### Advanced Question 4: Downcasting
+
+**Question:** How do you safely downcast a `std::unique_ptr<Base>` to a `std::unique_ptr<Derived>`?
+
+<details>
+<summary>View Answer</summary>
+
+**Answer: Very carefully.** 
+
+Unlike `std::shared_ptr` (which has `std::dynamic_pointer_cast`), there is no standard cast function for `std::unique_ptr`. To downcast while transferring ownership, you must `.release()` the raw pointer, perform a raw `dynamic_cast`, and wrap it back up. 
+
+If the cast fails, you are manually responsible for freeing the released memory to avoid a leak!
+
+```cpp
+template<typename Derived, typename Base>
+std::unique_ptr<Derived> unique_dynamic_cast(std::unique_ptr<Base>& p) {
+    if (Derived* d = dynamic_cast<Derived*>(p.get())) {
+        p.release();
+        return std::unique_ptr<Derived>(d);
+    }
+    return nullptr; 
+    // Notice that if the cast fails, we leave the original unique_ptr intact.
+}
+```
+</details>
+
+---
+
 ### Factory Functions & Object Hierarchies
 
 A common use for `std::unique_ptr` is a factory function return type for objects in a hierarchy. Consider the following hierarchy for types of investments with a base class `Investment`:
