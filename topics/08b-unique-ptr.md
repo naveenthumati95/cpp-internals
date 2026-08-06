@@ -14,6 +14,7 @@ Before C++11, developers relied heavily on raw pointers for dynamic memory manag
 **Smart pointers** are one way to address these issues. Smart pointers are wrappers around raw pointers that act much like the raw pointers they wrap, but that avoid many of their pitfalls. You should therefore prefer smart pointers to raw pointers. Smart pointers can do virtually everything raw pointers can, but with far fewer opportunities for error.
 
 There are four smart pointers in C++11:
+
 - `std::auto_ptr` (deprecated leftover from C++98)
 - `std::unique_ptr`
 - `std::shared_ptr`
@@ -59,10 +60,12 @@ int main() {
 Because `process` takes the argument by value, the compiler attempts to invoke the copy constructor of `std::unique_ptr`. Since copying is deleted, it fails to compile. 
 
 To pass ownership to the function, you **must** explicitly move it:
+
 ```cpp
 process(std::move(p)); // Compiles! Ownership is transferred to the function.
 // 'p' is now nullptr.
 ```
+
 </details>
 
 ---
@@ -79,6 +82,7 @@ process(std::move(p)); // Compiles! Ownership is transferred to the function.
 Using `std::move` on a local variable in a return statement is an anti-pattern. C++ rules dictate that local variables being returned by value are automatically treated as rvalues. 
 
 Furthermore, explicitly writing `std::move` disables **Return Value Optimization (RVO / NRVO)**, forcing the compiler to actually execute the move constructor instead of constructing the object directly in the caller's stack frame. By writing `return ptr;`, you get the fastest possible code.
+
 </details>
 
 ---
@@ -95,6 +99,7 @@ Furthermore, explicitly writing `std::move` disables **Return Value Optimization
 You can declare the `unique_ptr` member, but you **cannot destroy it** while `Widget` is incomplete. The compiler’s default deleter requires `sizeof(Widget)` and calls `delete`, which fails to compile on an incomplete type. 
 
 If you do this, you **must** explicitly define the destructor of the containing class in the `.cpp` file where `Widget` is fully defined, even if the destructor does nothing (`~MyClass() = default;`).
+
 </details>
 
 ---
@@ -111,6 +116,7 @@ If you do this, you **must** explicitly define the destructor of the containing 
 However, `std::vector` provides the **strong exception guarantee**. If an exception is thrown during reallocation, the vector must remain unchanged. Because moving elements alters the original objects, `std::vector` will *only* use move constructors if they are marked `noexcept`. If the move constructor is not `noexcept`, the vector falls back to **copying** the elements.
 
 Since `std::unique_ptr` cannot be copied, if it is stored inside a custom class whose move constructor is not `noexcept`, `std::vector` will try to copy it during reallocation and trigger a massive **compilation error**. Always mark your move constructors `noexcept`!
+
 </details>
 
 ---
@@ -139,6 +145,7 @@ std::unique_ptr<Derived> unique_dynamic_cast(std::unique_ptr<Base>& p) {
     // Notice that if the cast fails, we leave the original unique_ptr intact.
 }
 ```
+
 </details>
 
 ---
@@ -291,6 +298,7 @@ To truly understand how `std::unique_ptr` achieves exclusive ownership without o
 
 > **The Prompt:**
 > Write a templated class `UniquePtr<T>`. 
+> 
 > 1. It should wrap a raw pointer `T*`.
 > 2. Implement the constructor and destructor (RAII).
 > 3. Enforce exclusive ownership (disable copying).
@@ -351,11 +359,12 @@ public:
         delete m_ptr;
         m_ptr = ptr;
     }
-    
+
     // Bonus: Boolean conversion for easy null-checking
     explicit operator bool() const { return m_ptr != nullptr; }
 };
 ```
+
 </details>
 
 ---
@@ -375,6 +384,7 @@ One of the most powerful architectural patterns in C++ is the **Pimpl (Pointer t
 <summary>View the Solution</summary>
 
 **Widget.h (The Header File)**
+
 ```cpp
 #pragma once
 #include <memory>
@@ -402,6 +412,7 @@ private:
 ```
 
 **Widget.cpp (The Source File)**
+
 ```cpp
 #include "Widget.h"
 #include <vector>
@@ -428,6 +439,7 @@ void Widget::doWork() {
     std::cout << "Working with hidden data!\n";
 }
 ```
+
 </details>
 
 ---
@@ -437,6 +449,7 @@ void Widget::doWork() {
 While `std::unique_ptr` protects against most memory leaks, it is not invincible. Here are the most dangerous traps advanced developers fall into.
 
 ### 1. The Double-Free from Raw Pointers
+
 Never initialize two `std::unique_ptr`s with the exact same raw pointer.
 
 ```cpp
@@ -444,11 +457,14 @@ int* raw = new int(42);
 std::unique_ptr<int> p1(raw);
 std::unique_ptr<int> p2(raw); // FATAL BUG
 ```
+
 Both `p1` and `p2` think they have exclusive ownership. When they go out of scope, they will both attempt to `delete` the same memory address, crashing your program. 
 *(Solution: Always use `std::make_unique` instead of raw `new`).*
+
 > **Warning:** Always use `std::make_unique` instead of raw `new`.
 
 ### 2. Dangling from `.get()`
+
 The `.get()` method exists to interface with legacy C-APIs that require raw pointers. **Never store the result of `.get()`**.
 
 ```cpp
@@ -462,4 +478,5 @@ int* dangling_ptr = nullptr;
 ```
 
 ---
+
 *Last updated: August 2026*
